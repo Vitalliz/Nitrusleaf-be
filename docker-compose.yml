@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:8.0
+    container_name: nitrusleaf-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    ports:
+      - "3306:3306"
+    volumes:
+      - nitrusleaf_data:/var/lib/mysql
+    networks:
+      - nitrusleaf-network
+
+  api:
+    build: .
+    container_name: nitrusleaf-api
+    environment:
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    networks:
+      - nitrusleaf-network
+
+networks:
+  nitrusleaf-network:
+    driver: bridge
+
+volumes:
+  nitrusleaf_data:
