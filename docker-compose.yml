@@ -19,12 +19,11 @@ services:
   api:
     build: .
     container_name: nitrusleaf-api
+    env_file:
+      - .env  # Carrega todas as variáveis do .env
     environment:
       DB_HOST: database
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
     ports:
       - "3000:3000"
     depends_on:
