@@ -1,4 +1,5 @@
 // Model: Pessoa
+export default (sequelize, DataTypes) => {
 const Pessoa = sequelize.define('Pessoa', {
   id_pessoa: { 
     type: DataTypes.INTEGER, 
@@ -62,3 +63,5 @@ const Pessoa = sequelize.define('Pessoa', {
   tableName: 'pessoas',
   timestamps: false 
 });
+return Pessoa;
+}

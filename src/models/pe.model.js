@@ -1,4 +1,5 @@
 // Model: Pe (Pé de Planta)
+export default (sequelize, DataTypes) => {
 const Pe = sequelize.define('Pe', {
     id_pe: { 
       type: DataTypes.INTEGER, 
@@ -28,4 +29,5 @@ const Pe = sequelize.define('Pe', {
     tableName: 'pes',
     timestamps: false 
   });
-  
+  return Pe;
+}

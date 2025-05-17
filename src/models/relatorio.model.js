@@ -1,5 +1,6 @@
 // Model: Relatorio
-const Relatorio = sequelize.define('Relatorio', {
+export default (sequelize, DataTypes) => {
+const Relatorio =  sequelize.define('Relatorio', {
     id_relatorio: { 
       type: DataTypes.INTEGER, 
       autoIncrement: true, 
@@ -36,4 +37,6 @@ const Relatorio = sequelize.define('Relatorio', {
   { 
     tableName: 'relatorios',
     timestamps: false 
-  });  
+  });
+  return Relatorio;
+}

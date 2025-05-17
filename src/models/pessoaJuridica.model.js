@@ -1,4 +1,5 @@
 // Model: PessoaJuridica
+export default (sequelize, DataTypes) => {
 const PessoaJuridica = sequelize.define('PessoaJuridica', {
     id_pessoa: { 
       type: DataTypes.INTEGER, 
@@ -17,3 +18,5 @@ const PessoaJuridica = sequelize.define('PessoaJuridica', {
     tableName: 'pessoas_juridicas',
     timestamps: false 
   });  
+  return PessoaJuridica;
+}

@@ -1,5 +1,5 @@
-// Model: Cargo
-const Cargo = sequelize.define('Cargo', {
+export default (sequelize, DataTypes) => {
+  const Cargo = sequelize.define('Cargo', {
     id_cargo: { 
       type: DataTypes.INTEGER, 
       autoIncrement: true, 
@@ -13,8 +13,9 @@ const Cargo = sequelize.define('Cargo', {
     descricao: { 
       type: DataTypes.TEXT 
     }
-  }, 
-  { 
+  }, { 
     tableName: 'cargos',
     timestamps: false 
-  });  
+  });
+  return Cargo;
+};

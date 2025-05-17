@@ -1,4 +1,5 @@
 // Model: Propriedade
+export default (sequelize, DataTypes) => {
 const Propriedade = sequelize.define('Propriedade', {
     id_propriedade: { 
       type: DataTypes.INTEGER, 
@@ -34,3 +35,5 @@ const Propriedade = sequelize.define('Propriedade', {
     tableName: 'propriedades',
     timestamps: false 
   });  
+  return Propriedade;
+}

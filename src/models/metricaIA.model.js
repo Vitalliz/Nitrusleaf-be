@@ -1,4 +1,5 @@
 // Model: MetricaIA
+export default (sequelize, DataTypes) => {
 const MetricaIA = sequelize.define('MetricaIA', {
     id_metrica: { 
       type: DataTypes.INTEGER, 
@@ -34,3 +35,5 @@ const MetricaIA = sequelize.define('MetricaIA', {
     tableName: 'metricas_ia',
     timestamps: false 
   });  
+  return MetricaIA;
+}

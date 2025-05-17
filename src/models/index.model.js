@@ -3,13 +3,13 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import applyAssociations from './associations.js';
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Conexão com Sequelize
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
@@ -24,25 +24,35 @@ const sequelize = new Sequelize(
 
 const db = {};
 
-// Carregar modelos automaticamente
-const modelFiles = fs
-  .readdirSync(__dirname)
-  .filter((file) => file.endsWith('.js') && file !== 'index.js');
+async function loadModels() {
+  console.log('> Início loadModels');
+  try {
+    const modelFiles = fs
+      .readdirSync(__dirname)
+      .filter((file) => file.endsWith('.js') && file !== 'index.model.js' && file !== 'associations.js' && file !== 'db.js');
 
-for (const file of modelFiles) {
-  const { default: defineModel } = await import(`./${file}`);
-  const model = defineModel(sequelize, DataTypes);
-  db[model.name] = model;
+    console.log(`> Arquivos de modelo encontrados: ${modelFiles}`);
+    for (const file of modelFiles) {
+      console.log(`> Importando modelo ${file}`);
+      const { default: defineModel } = await import(`./${file}`);
+      const model = defineModel(sequelize, DataTypes);
+      db[model.name] = model;
+      console.log(`> Modelo ${model.name} importado`);
+    }
+    console.log('Modelos carregados no db:', Object.keys(db));
+
+    applyAssociations(db);
+    console.log('> Associações aplicadas com sucesso');
+
+    db.sequelize = sequelize;
+    db.Sequelize = Sequelize;
+
+    console.log('> loadModels finalizado');
+    return db;
+  } catch (error) {
+    console.error('Erro em loadModels:', error);
+    throw error;
+  }
 }
 
-// Definir associações se existirem
-Object.values(db).forEach((model) => {
-  if (typeof model.associate === 'function') {
-    model.associate(db);
-  }
-});
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-export default db;
+export default loadModels;

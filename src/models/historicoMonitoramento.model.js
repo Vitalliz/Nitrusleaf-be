@@ -1,4 +1,5 @@
 // Model: HistoricoMonitoramento
+export default (sequelize, DataTypes) => {
 const HistoricoMonitoramento = sequelize.define('HistoricoMonitoramento', {
     id_historico: { 
       type: DataTypes.INTEGER, 
@@ -24,4 +25,6 @@ const HistoricoMonitoramento = sequelize.define('HistoricoMonitoramento', {
   { 
     tableName: 'historicos_monitoramentos',
     timestamps: false 
-  });  
+  });
+  return HistoricoMonitoramento;
+}

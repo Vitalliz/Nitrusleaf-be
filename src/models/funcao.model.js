@@ -1,4 +1,5 @@
 // Model: Funcao
+export default (sequelize, DataTypes) => {
 const Funcao = sequelize.define('Funcao', {
     id_funcao: { 
       type: DataTypes.INTEGER, 
@@ -22,3 +23,5 @@ const Funcao = sequelize.define('Funcao', {
     tableName: 'funcoes',
     timestamps: false 
   });  
+  return Funcao;
+}

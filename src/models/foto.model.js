@@ -1,4 +1,5 @@
 // Model: Foto
+export default (sequelize, DataTypes) => {
 const Foto = sequelize.define('Foto', {
     id_foto: { 
       type: DataTypes.INTEGER, 
@@ -24,4 +25,6 @@ const Foto = sequelize.define('Foto', {
   { 
     tableName: 'fotos',
     timestamps: false 
-  });  
+  }); 
+  return Foto; 
+}

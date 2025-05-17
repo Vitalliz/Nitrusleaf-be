@@ -1,4 +1,5 @@
 // Model: CargoFuncao
+export default (sequelize, DataTypes) => {
 const CargoFuncao = sequelize.define('CargoFuncao', {
     fk_id_cargo: { 
       type: DataTypes.INTEGER, 
@@ -14,4 +15,6 @@ const CargoFuncao = sequelize.define('CargoFuncao', {
   { 
     tableName: 'cargos_funcoes',
     timestamps: false 
-  });  
+  }); 
+  return CargoFuncao; 
+}
