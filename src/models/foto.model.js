@@ -19,7 +19,7 @@ const Foto = sequelize.define('Foto', {
       allowNull: false 
     },
     resultado_analise: { 
-      type: DataTypes.STRING(100) 
+      type: DataTypes.TEXT
     }
   }, 
   { 

@@ -1,24 +1,38 @@
+// src/index.js
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 import getDb from './models/db.js'; // singleton que importa e carrega db
-import pessoaRoutes from './routes/pessoa.route.js';
-import tipoFuncaoRoutes from './routes/tipoFuncao.route.js';
-import funcaoRoutes from './routes/funcao.route.js';
-import cargoRoutes from './routes/cargo.route.js';
-import cargoFuncaoRoutes from './routes/cargoFuncao.route.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Resolver __dirname para ES6
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors());
 app.use(express.json());
 
-// usar rotas diretamente, sem precisar passar db aqui se singleton estiver ok
-app.use('/pessoas', pessoaRoutes);
-app.use('/tipoFuncoes', tipoFuncaoRoutes);
-app.use('/funcao', funcaoRoutes);
-app.use('/cargo', cargoRoutes);
-app.use('cargoFuncao', cargoFuncaoRoutes);
+// Função para carregar automaticamente todas as rotas da pasta "routes"
+async function loadRoutes(app) {
+  const routesDir = path.resolve(__dirname, './routes');
+  const routeFiles = fs.readdirSync(routesDir).filter(file => file.endsWith('.route.js'));
+
+  for (const routeFile of routeFiles) {
+    const routePath = pathToFileURL(path.join(routesDir, routeFile)).href;
+    try {
+      const routeModule = await import(routePath);
+      const routeName = routeFile.replace('.route.js', '');
+      app.use(`/${routeName}`, routeModule.default);
+      console.log(`✅ Rota /${routeName} carregada.`);
+    } catch (error) {
+      console.error(`❌ Erro ao carregar rota ${routeFile}:`, error);
+    }
+  }
+}
 
 async function startServer() {
   try {
@@ -28,6 +42,9 @@ async function startServer() {
 
     await db.sequelize.sync({ force: false, alter: false });
     console.log('✅ Tabelas sincronizadas.');
+
+    // Carregar rotas automaticamente
+    await loadRoutes(app);
 
     app.get('/', (req, res) => {
       res.send('🚀 API NitrusLeaf online!');

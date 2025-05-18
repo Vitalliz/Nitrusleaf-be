@@ -12,9 +12,7 @@ const TipoFuncao = sequelize.define('TipoFuncao', {
       unique: true 
     },
     descricao: { 
-      type: DataTypes.STRING(50), 
-      allowNull: false, 
-      unique: true 
+      type: DataTypes.TEXT, 
     }
   }, 
   { 

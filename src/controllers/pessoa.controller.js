@@ -1,12 +1,24 @@
+// src/controllers/pessoa.controller.js
 import pessoaService from '../services/pessoa.service.js';
-
-/**
- * Controller para gerenciar requisições da entidade Pessoa
- */
 
 // Criar uma nova pessoa
 async function createPessoa(req, res) {
   try {
+    const { nome, email, senha_hash, tipo } = req.body;
+    
+    // Validação básica dos campos obrigatórios
+    if (!nome || !email || !senha_hash || !tipo) {
+      return res.status(400).json({ error: 'Nome, email, senha e tipo são obrigatórios.' });
+    }
+
+    if (tipo === 'fisica' && (!req.body.cpf || !req.body.data_nasc)) {
+      return res.status(400).json({ error: 'CPF e data de nascimento são obrigatórios para pessoa física.' });
+    }
+
+    if (tipo === 'juridica' && (!req.body.cnpj || !req.body.nome_fantasia)) {
+      return res.status(400).json({ error: 'CNPJ e nome fantasia são obrigatórios para pessoa jurídica.' });
+    }
+
     const pessoa = await pessoaService.createPessoa(req.body);
     res.status(201).json(pessoa);
   } catch (error) {
@@ -40,6 +52,17 @@ async function getPessoaById(req, res) {
 // Atualizar pessoa por ID
 async function updatePessoa(req, res) {
   try {
+    const { tipo } = req.body;
+
+    // Validação básica para atualização
+    if (tipo === 'fisica' && (!req.body.cpf || !req.body.data_nasc)) {
+      return res.status(400).json({ error: 'CPF e data de nascimento são obrigatórios para pessoa física.' });
+    }
+
+    if (tipo === 'juridica' && (!req.body.cnpj || !req.body.nome_fantasia)) {
+      return res.status(400).json({ error: 'CNPJ e nome fantasia são obrigatórios para pessoa jurídica.' });
+    }
+
     const pessoa = await pessoaService.updatePessoa(req.params.id, req.body);
     if (!pessoa) {
       return res.status(404).json({ error: 'Pessoa não encontrada para atualização' });
@@ -68,5 +91,5 @@ export default {
   getAllPessoas,
   getPessoaById,
   updatePessoa,
-  deletePessoa
+  deletePessoa,
 };

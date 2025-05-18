@@ -11,7 +11,7 @@ const Propriedade = sequelize.define('Propriedade', {
       allowNull: false 
     },
     nome: { 
-      type: DataTypes.STRING(100), 
+      type: DataTypes.STRING(160), 
       allowNull: false 
     },
     talhoes_registrados: { 
