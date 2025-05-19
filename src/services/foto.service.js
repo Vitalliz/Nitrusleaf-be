@@ -1,5 +1,19 @@
 import getDb from '../models/db.js';
 
+// Função para atualizar a situação do pé
+async function atualizarSituacaoPe(fk_id_pe) {
+  const db = await getDb();
+  const relatorios = await db.Relatorio.count({ where: { fk_id_pe } });
+
+  // Se houver relatórios, o pé é "nao tratado", senão "sem informacoes"
+  const situacao = relatorios > 0 ? "nao tratado" : "sem informacoes";
+
+  await db.Pe.update(
+    { situacao },
+    { where: { id_pe: fk_id_pe } }
+  );
+}
+
 // Função para gerar um relatório automaticamente com base na foto criada
 async function createRelatorioAutomatico(foto) {
   const db = await getDb();
@@ -25,6 +39,9 @@ async function createRelatorioAutomatico(foto) {
     outros,
     data_analise: foto.data_foto,
   });
+
+  // 🚀 Atualiza a situação do pé para "nao tratado"
+  await atualizarSituacaoPe(foto.fk_id_pe);
 }
 
 // 🚀 Criar várias Fotos e automaticamente criar os relatórios
@@ -101,8 +118,14 @@ async function deleteFoto(id) {
     if (!foto) {
       return false;
     }
+
+    const fk_id_pe = foto.fk_id_pe;
     await db.Relatorio.destroy({ where: { fk_id_foto: foto.id_foto } }); // 🚀 Excluir relatório automaticamente
     await foto.destroy();
+    
+    // 🚀 Atualizar a situação do pé após a exclusão do relatório
+    await atualizarSituacaoPe(fk_id_pe);
+
     return true;
   } catch (error) {
     throw new Error(`Erro ao deletar Foto: ${error.message}`);
