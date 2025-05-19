@@ -1,9 +1,31 @@
 // src/services/pessoa.service.js
 import getDb from '../models/db.js';
+import bcrypt from 'bcryptjs';
 
+// Função para criar uma nova pessoa com senha hasheada
 async function createPessoa(data) {
   try {
     const db = await getDb();
+    
+    // Verificação de CPF ou CNPJ duplicado
+    if (data.tipo === 'fisica') {
+      const existingPessoaFisica = await db.PessoaFisica.findOne({
+        where: { cpf: data.cpf }
+      });
+      if (existingPessoaFisica) {
+        throw new Error('CPF já cadastrado.');
+      }
+    } else if (data.tipo === 'juridica') {
+      const existingPessoaJuridica = await db.PessoaJuridica.findOne({
+        where: { cnpj: data.cnpj }
+      });
+      if (existingPessoaJuridica) {
+        throw new Error('CNPJ já cadastrado.');
+      }
+    }
+
+    // Hash da senha antes de salvar
+    const hashedPassword = await bcrypt.hash(data.senha, 10);
     
     // Cria a pessoa na tabela principal
     const pessoa = await db.Pessoa.create({
@@ -15,12 +37,12 @@ async function createPessoa(data) {
       bairro: data.bairro,
       cidade: data.cidade,
       numero: data.numero,
-      senha_hash: data.senha_hash,
+      senha_hash: hashedPassword, // Senha já hasheada
       status: data.status || 'ativo',
       fk_id_cargo: data.fk_id_cargo,
     });
 
-    // Verifica se é Pessoa Física ou Jurídica
+    // Verifica se é Pessoa Física ou Jurídica e cria o registro correspondente
     if (data.tipo === 'fisica') {
       await db.PessoaFisica.create({
         id_pessoa: pessoa.id_pessoa,
@@ -41,6 +63,7 @@ async function createPessoa(data) {
   }
 }
 
+// Buscar todas as pessoas (com dados completos)
 async function getAllPessoas() {
   try {
     const db = await getDb();
@@ -56,6 +79,7 @@ async function getAllPessoas() {
   }
 }
 
+// Buscar uma pessoa por ID
 async function getPessoaById(id) {
   try {
     const db = await getDb();
@@ -71,12 +95,18 @@ async function getPessoaById(id) {
   }
 }
 
+// Atualizar pessoa (com hash de senha se for atualizado)
 async function updatePessoa(id, data) {
   try {
     const db = await getDb();
     const pessoa = await db.Pessoa.findByPk(id);
     if (!pessoa) {
       return null;
+    }
+
+    // Hash da senha apenas se for atualizada
+    if (data.senha) {
+      data.senha_hash = await bcrypt.hash(data.senha, 10);
     }
 
     // Atualiza os dados principais
@@ -107,6 +137,7 @@ async function updatePessoa(id, data) {
   }
 }
 
+// Deletar pessoa
 async function deletePessoa(id) {
   try {
     const db = await getDb();

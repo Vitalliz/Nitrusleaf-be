@@ -4,10 +4,11 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-import getDb from './models/db.js'; // singleton que importa e carrega db
+import getDb from './models/db.js';
+import authenticateToken from './middleware/auth.middleware.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Resolver __dirname para ES6
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +27,15 @@ async function loadRoutes(app) {
     try {
       const routeModule = await import(routePath);
       const routeName = routeFile.replace('.route.js', '');
-      app.use(`/${routeName}`, routeModule.default);
+
+      // Rotas que NÃO precisam de autenticação
+      if (routeName === 'auth' || (routeName === 'pessoas' && routeModule.default.stack.some(r => r.route.methods.post))) {
+        app.use(`/${routeName}`, routeModule.default);
+      } else {
+        // Rotas protegidas com JWT
+        app.use(`/${routeName}`, authenticateToken, routeModule.default);
+      }
+
       console.log(`✅ Rota /${routeName} carregada.`);
     } catch (error) {
       console.error(`❌ Erro ao carregar rota ${routeFile}:`, error);

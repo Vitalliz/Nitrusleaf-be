@@ -4,10 +4,10 @@ import pessoaService from '../services/pessoa.service.js';
 // Criar uma nova pessoa
 async function createPessoa(req, res) {
   try {
-    const { nome, email, senha_hash, tipo } = req.body;
+    const { nome, email, senha, tipo } = req.body;
     
     // Validação básica dos campos obrigatórios
-    if (!nome || !email || !senha_hash || !tipo) {
+    if (!nome || !email || !senha || !tipo) {
       return res.status(400).json({ error: 'Nome, email, senha e tipo são obrigatórios.' });
     }
 
@@ -19,6 +19,7 @@ async function createPessoa(req, res) {
       return res.status(400).json({ error: 'CNPJ e nome fantasia são obrigatórios para pessoa jurídica.' });
     }
 
+    // Chamar o service para criar a pessoa
     const pessoa = await pessoaService.createPessoa(req.body);
     res.status(201).json(pessoa);
   } catch (error) {
