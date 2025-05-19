@@ -10,6 +10,17 @@ async function createPropriedade(req, res) {
   }
 }
 
+// Controlador para criação em massa de propriedades
+async function createPropriedadesBulk(req, res) {
+  try {
+    const propriedades = await propriedadeService.createPropriedadesBulk(req.body);
+    res.status(201).json(propriedades);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
 async function getAllPropriedades(req, res) {
   try {
     const propriedades = await propriedadeService.getAllPropriedades();
@@ -59,6 +70,7 @@ export default {
   createPropriedade,
   getAllPropriedades,
   getPropriedadeById,
+  createPropriedadesBulk,
   updatePropriedade,
   deletePropriedade,
 };

@@ -7,6 +7,8 @@ const router = Router();
 // Rota para criar um novo Pé
 router.post('/', peController.createPe);
 
+router.post('/bulk', peController.createPesBulk);
+
 // Rota para buscar todos os Pés
 router.get('/', peController.getAllPes);
 

@@ -77,10 +77,19 @@ async function deletePropriedade(id) {
   }
 }
 
+// Serviço para criar propriedades em massa
+async function createPropriedadesBulk(data) {
+  const db = await getDb();
+  const propriedades = await db.Propriedade.bulkCreate(data);
+  return propriedades;
+}
+
+
 export default {
   createPropriedade,
   getAllPropriedades,
   getPropriedadeById,
   updatePropriedade,
+  createPropriedadesBulk,
   deletePropriedade,
 };

@@ -1,11 +1,55 @@
-// src/services/foto.service.js
 import getDb from '../models/db.js';
 
-// Criar uma nova Foto
+// Função para gerar um relatório automaticamente com base na foto criada
+async function createRelatorioAutomatico(foto) {
+  const db = await getDb();
+  const chance = Math.random();
+  let deficiencia_cobre = false;
+  let deficiencia_manganes = false;
+  let outros = false;
+
+  // Definir a deficiência com base na probabilidade
+  if (chance < 0.1) {
+    deficiencia_cobre = true;
+  } else if (chance < 0.2) {
+    deficiencia_manganes = true;
+  } else {
+    outros = true;
+  }
+
+  await db.Relatorio.create({
+    fk_id_pe: foto.fk_id_pe,
+    fk_id_foto: foto.id_foto,
+    deficiencia_cobre,
+    deficiencia_manganes,
+    outros,
+    data_analise: foto.data_foto,
+  });
+}
+
+// 🚀 Criar várias Fotos e automaticamente criar os relatórios
+async function createFotosBulk(dataArray) {
+  try {
+    const db = await getDb();
+    const fotos = await db.Foto.bulkCreate(dataArray);
+
+    // 🚀 Criar relatórios automaticamente para cada foto
+    for (const foto of fotos) {
+      await createRelatorioAutomatico(foto);
+    }
+
+    return fotos;
+  } catch (error) {
+    throw new Error(`Erro ao criar Fotos em massa: ${error.message}`);
+  }
+}
+
+// Criar uma nova Foto e automaticamente criar o relatório
 async function createFoto(data) {
   try {
     const db = await getDb();
     const foto = await db.Foto.create(data);
+    await createRelatorioAutomatico(foto); // 🚀 Criar o relatório automaticamente
     return foto;
   } catch (error) {
     throw new Error(`Erro ao criar Foto: ${error.message}`);
@@ -49,7 +93,7 @@ async function updateFoto(id, data) {
   }
 }
 
-// Deletar uma Foto por ID
+// Deletar uma Foto por ID e seu Relatório automaticamente
 async function deleteFoto(id) {
   try {
     const db = await getDb();
@@ -57,6 +101,7 @@ async function deleteFoto(id) {
     if (!foto) {
       return false;
     }
+    await db.Relatorio.destroy({ where: { fk_id_foto: foto.id_foto } }); // 🚀 Excluir relatório automaticamente
     await foto.destroy();
     return true;
   } catch (error) {
@@ -66,6 +111,7 @@ async function deleteFoto(id) {
 
 export default {
   createFoto,
+  createFotosBulk,
   getAllFotos,
   getFotoById,
   updateFoto,

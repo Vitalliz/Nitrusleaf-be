@@ -11,6 +11,16 @@ async function createTalhao(req, res) {
   }
 }
 
+// Controlador para criação em massa de talhões
+async function createTalhoesBulk(req, res) {
+  try {
+    const talhoes = await talhaoService.createTalhoesBulk(req.body);
+    res.status(201).json(talhoes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 // Buscar todos os Talhões
 async function getAllTalhoes(req, res) {
   try {
@@ -63,6 +73,7 @@ async function deleteTalhao(req, res) {
 export default {
   createTalhao,
   getAllTalhoes,
+  createTalhoesBulk,
   getTalhaoById,
   updateTalhao,
   deleteTalhao

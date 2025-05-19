@@ -7,6 +7,9 @@ const router = Router();
 // Rota para criar um novo Talhão
 router.post('/', talhaoController.createTalhao);
 
+
+router.post('/bulk', talhaoController.createTalhoesBulk);
+
 // Rota para buscar todos os Talhões
 router.get('/', talhaoController.getAllTalhoes);
 

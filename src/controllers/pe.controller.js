@@ -11,6 +11,16 @@ async function createPe(req, res) {
   }
 }
 
+// Controlador para criação em massa de pes
+async function createPesBulk(req, res) {
+  try {
+    const pes = await peService.createPesBulk(req.body);
+    res.status(201).json(pes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 // Buscar todos os Pés
 async function getAllPes(req, res) {
   try {
@@ -62,6 +72,7 @@ async function deletePe(req, res) {
 
 export default {
   createPe,
+  createPesBulk,
   getAllPes,
   getPeById,
   updatePe,

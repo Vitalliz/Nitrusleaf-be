@@ -7,6 +7,8 @@ const router = Router();
 // Rota para criar uma nova Foto
 router.post('/', fotoController.createFoto);
 
+router.post('/', fotoController.createFotosBulk);
+
 // Rota para buscar todas as Fotos
 router.get('/', fotoController.getAllFotos);
 

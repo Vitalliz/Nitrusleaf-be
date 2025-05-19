@@ -1,4 +1,3 @@
-// src/controllers/foto.controller.js
 import fotoService from '../services/foto.service.js';
 
 // Criar uma nova Foto
@@ -6,6 +5,16 @@ async function createFoto(req, res) {
   try {
     const foto = await fotoService.createFoto(req.body);
     res.status(201).json(foto);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// 🚀 Criar Fotos em massa com relatórios automáticos
+async function createFotosBulk(req, res) {
+  try {
+    const fotos = await fotoService.createFotosBulk(req.body);
+    res.status(201).json(fotos);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -62,6 +71,7 @@ async function deleteFoto(req, res) {
 
 export default {
   createFoto,
+  createFotosBulk,
   getAllFotos,
   getFotoById,
   updateFoto,

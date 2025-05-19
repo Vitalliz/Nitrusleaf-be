@@ -32,7 +32,7 @@ async function loadRoutes(app) {
       if (routeName === 'auth' || (routeName === 'pessoas' && routeModule.default.stack.some(r => r.route.methods.post))) {
         app.use(`/${routeName}`, routeModule.default);
       } else {
-        // Rotas protegidas com JWT
+        // Rotas protegidas com JWT para todas as outras
         app.use(`/${routeName}`, authenticateToken, routeModule.default);
       }
 
