@@ -1,5 +1,6 @@
 // src/controllers/auth.controller.js
 import authService from '../services/auth.service.js';
+import getDb from '../models/db.js';
 
 // Controlador de Login
 async function login(req, res) {
@@ -27,6 +28,24 @@ async function refresh(req, res) {
   }
 }
 
+async function getAuthenticatedUser(req, res) {
+  try {
+    const db = await getDb();
+    const user = await db.Pessoa.findByPk(req.user.id, {
+      attributes: ['id_pessoa', 'nome', 'email'],
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    console.log("🔧 Usuário autenticado encontrado:", user);
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("❌ Erro ao obter usuário autenticado:", error);
+    res.status(500).json({ error: 'Erro ao obter usuário autenticado.' });
+  }
+}
 // Controlador de Logout
 async function logout(req, res) {
   try {
@@ -45,5 +64,6 @@ async function logout(req, res) {
 export default {
   login,
   refresh,
+  getAuthenticatedUser,
   logout
 };

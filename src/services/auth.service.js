@@ -76,8 +76,28 @@ async function logout(refreshToken) {
   await db.RefreshToken.destroy({ where: { token: refreshToken } });
 }
 
+// ✅ Função para obter o usuário autenticado pelo ID (usando o JWT)
+async function getAuthenticatedUserById(userId) {
+  try {
+    const db = await getDb();
+    const user = await db.Pessoa.findByPk(userId, {
+      attributes: ['id_pessoa', 'nome', 'email'],
+    });
+
+    console.log(user.data)
+    if (!user) {
+      throw new Error('Usuário não encontrado.');
+    }
+
+    return user;
+  } catch (error) {
+    throw new Error(`Erro ao obter usuário autenticado: ${error.message}`);
+  }
+}
+
 export default {
   login,
+  getAuthenticatedUserById,
   refreshAccessToken,
   logout
 };
