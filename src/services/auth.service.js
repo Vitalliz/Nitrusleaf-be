@@ -38,7 +38,9 @@ async function generateRefreshToken(usuario) {
 async function login(email, senha) {
   const db = await getDb();
   const usuario = await db.Pessoa.findOne({ where: { email } });
-
+  const propriedade = await db.Propriedade.findAll({
+    where: { fk_id_proprietario: usuario.id_pessoa }
+  })
   if (!usuario) {
     throw new Error('Usuário não encontrado');
   }
@@ -51,7 +53,9 @@ async function login(email, senha) {
   const accessToken = await generateAccessToken(usuario);
   const refreshToken = await generateRefreshToken(usuario);
 
-  return { accessToken, refreshToken, usuario: { id: usuario.id_pessoa, nome: usuario.nome, email: usuario.email } };
+  const propriedadesData = propriedade.map(p => ({ id_propriedade: p.id_propriedade, nome: p.nome }));
+  console.log("Service",propriedadesData, usuario.id_pessoa)
+  return { accessToken, refreshToken, usuario: { id: usuario.id_pessoa, nome: usuario.nome, email: usuario.email }, propriedades: propriedadesData };
 }
 
 // Função para Refresh Token
@@ -83,13 +87,17 @@ async function getAuthenticatedUserById(userId) {
     const user = await db.Pessoa.findByPk(userId, {
       attributes: ['id_pessoa', 'nome', 'email'],
     });
-
-    console.log(user.data)
+    const propriedades = await db.Propriedade.findAll({
+      where:{fk_id_proprietario: user.id_pessoa}
+    })
+      
+    console.log("getAuthenticatedUserByID",user.data)
     if (!user) {
       throw new Error('Usuário não encontrado.');
     }
-
-    return user;
+    const propriedadesData = propriedades.map(p => ({ id: p.id_propriedade, nome: p.nome }));
+    console.log("getAuthenticatedUserById", propriedadesData)
+    return {user, propriedades: propriedadesData};
   } catch (error) {
     throw new Error(`Erro ao obter usuário autenticado: ${error.message}`);
   }
@@ -97,6 +105,8 @@ async function getAuthenticatedUserById(userId) {
 
 export default {
   login,
+  generateAccessToken,
+  generateRefreshToken,
   getAuthenticatedUserById,
   refreshAccessToken,
   logout

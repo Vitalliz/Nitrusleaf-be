@@ -6,8 +6,9 @@ import getDb from '../models/db.js';
 async function login(req, res) {
   try {
     const { email, senha } = req.body;
-    const { accessToken, refreshToken, usuario } = await authService.login(email, senha);
-    res.status(200).json({ accessToken, refreshToken, usuario });
+    const { accessToken, refreshToken, usuario, propriedades } = await authService.login(email, senha);
+    console.log("Controller",propriedades)
+  res.status(200).json({ accessToken, refreshToken, usuario, propriedades });
   } catch (error) {
     res.status(401).json({ error: error.message });
   }
@@ -30,22 +31,20 @@ async function refresh(req, res) {
 
 async function getAuthenticatedUser(req, res) {
   try {
-    const db = await getDb();
-    const user = await db.Pessoa.findByPk(req.user.id, {
-      attributes: ['id_pessoa', 'nome', 'email'],
-    });
+    const { user, propriedades } = await authService.getAuthenticatedUserById(req.user.id);
 
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
 
-    console.log("🔧 Usuário autenticado encontrado:", user);
-    res.status(200).json(user);
+    console.log("🔧 Usuário autenticado encontrado:", user, "Propriedades:", propriedades);
+    res.status(200).json({ user, propriedades });
   } catch (error) {
     console.error("❌ Erro ao obter usuário autenticado:", error);
     res.status(500).json({ error: 'Erro ao obter usuário autenticado.' });
   }
 }
+
 // Controlador de Logout
 async function logout(req, res) {
   try {
