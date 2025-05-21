@@ -84,6 +84,9 @@ function applyAssociations(db) {
         foreignKey: 'fk_id_foto'
     });
 
+    db.Relatorio.belongsTo(db.Pe, { foreignKey: 'fk_id_pe', as: 'pe' });
+    db.Pe.hasMany(db.Relatorio, { foreignKey: 'fk_id_pe', as: 'relatorios' });
+
     // ✅ Relatório -> Métrica IA
     db.Relatorio.hasOne(db.MetricaIA, {
         foreignKey: 'fk_id_relatorio',

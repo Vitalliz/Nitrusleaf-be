@@ -12,11 +12,17 @@ async function createRelatorio(data) {
   }
 }
 
+
 // Buscar todos os Relatórios
 async function getAllRelatorios() {
   try {
     const db = await getDb();
-    const relatorios = await db.Relatorio.findAll();
+    console.log('Associations Relatorio:', Object.keys(db.Relatorio.associations));
+    const relatorios = await db.Relatorio.findAll({
+    where: { propriedadeId: someId },
+    include: [{ model: db.Pe, as: 'pe' }] // usar o alias exato da associação
+  });
+
     return relatorios;
   } catch (error) {
     throw new Error(`Erro ao buscar Relatórios: ${error.message}`);
