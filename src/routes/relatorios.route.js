@@ -8,7 +8,10 @@ const router = Router();
 router.post('/', relatorioController.createRelatorio);
 
 // Rota para buscar todos os Relatórios
-router.get('/', relatorioController.getAllRelatorios);
+router.get('/', relatorioController.getAllRelatoriosByProperty);
+
+router.get('/all', relatorioController.getAllRelatorios);
+
 
 // Rota para buscar um Relatório por ID
 router.get('/:id', relatorioController.getRelatorioById);

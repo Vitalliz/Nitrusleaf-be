@@ -12,6 +12,15 @@ async function createRelatorio(req, res) {
 }
 
 // Buscar todos os Relatórios
+async function getAllRelatoriosByProperty(req, res) {
+  try {
+    const relatorios = await relatorioService.getAllRelatoriosByProperty();
+    res.json(relatorios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 async function getAllRelatorios(req, res) {
   try {
     const relatorios = await relatorioService.getAllRelatorios();
@@ -62,6 +71,7 @@ async function deleteRelatorio(req, res) {
 
 export default {
   createRelatorio,
+  getAllRelatoriosByProperty,
   getAllRelatorios,
   getRelatorioById,
   updateRelatorio,

@@ -11,6 +11,17 @@ async function createTalhao(req, res) {
   }
 }
 
+// Buscar os pés de um talhão específico
+async function getPesByTalhaoId(req, res) {
+  try {
+    const pes = await talhaoService.getPesByTalhaoId(req.params.id);
+    res.json(pes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
 // Controlador para criação em massa de talhões
 async function createTalhoesBulk(req, res) {
   try {
@@ -73,6 +84,7 @@ async function deleteTalhao(req, res) {
 export default {
   createTalhao,
   getAllTalhoes,
+  getPesByTalhaoId,
   createTalhoesBulk,
   getTalhaoById,
   updateTalhao,

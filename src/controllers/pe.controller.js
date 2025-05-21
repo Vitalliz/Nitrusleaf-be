@@ -70,8 +70,20 @@ async function deletePe(req, res) {
   }
 }
 
+// Buscar relatórios de um Pé
+async function getRelatoriosByPeId(req, res) {
+  try {
+    const relatorios = await peService.getRelatoriosByPeId(req.params.id);
+    res.json(relatorios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
 export default {
   createPe,
+  getRelatoriosByPeId,
   createPesBulk,
   getAllPes,
   getPeById,

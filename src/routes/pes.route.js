@@ -21,4 +21,7 @@ router.put('/:id', peController.updatePe);
 // Rota para deletar um Pé por ID
 router.delete('/:id', peController.deletePe);
 
+router.get('/:id/relatorios', peController.getRelatoriosByPeId);
+
+
 export default router;

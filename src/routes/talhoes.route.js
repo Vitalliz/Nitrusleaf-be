@@ -13,6 +13,9 @@ router.post('/bulk', talhaoController.createTalhoesBulk);
 // Rota para buscar todos os Talhões
 router.get('/', talhaoController.getAllTalhoes);
 
+router.get('/:id/pes', talhaoController.getPesByTalhaoId);
+
+
 // Rota para buscar um Talhão por ID
 router.get('/:id', talhaoController.getTalhaoById);
 

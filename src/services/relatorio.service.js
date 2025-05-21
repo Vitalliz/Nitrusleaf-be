@@ -14,7 +14,7 @@ async function createRelatorio(data) {
 
 
 // Buscar todos os Relatórios
-async function getAllRelatorios() {
+async function getAllRelatoriosByProperty() {
   try {
     const db = await getDb();
     console.log('Associations Relatorio:', Object.keys(db.Relatorio.associations));
@@ -22,6 +22,18 @@ async function getAllRelatorios() {
     where: { propriedadeId: someId },
     include: [{ model: db.Pe, as: 'pe' }] // usar o alias exato da associação
   });
+
+    return relatorios;
+  } catch (error) {
+    throw new Error(`Erro ao buscar Relatórios: ${error.message}`);
+  }
+}
+
+// Buscar todos os Relatórios
+async function getAllRelatorios() {
+  try {
+    const db = await getDb();
+    const relatorios = await db.Relatorio.findAll();
 
     return relatorios;
   } catch (error) {
@@ -72,8 +84,9 @@ async function deleteRelatorio(id) {
 
 export default {
   createRelatorio,
-  getAllRelatorios,
+  getAllRelatoriosByProperty,
   getRelatorioById,
   updateRelatorio,
+  getAllRelatorios,
   deleteRelatorio,
 };

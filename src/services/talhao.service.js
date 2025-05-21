@@ -32,6 +32,30 @@ async function createTalhoesBulk(data) {
   return talhoes;
 }
 
+async function getPesByTalhaoId(talhaoId) {
+  try {
+    const db = await getDb();
+    const pes = await db.Pe.findAll({
+      where: { fk_id_talhao: talhaoId },
+      attributes: [
+        'id_pe',
+        'nome',
+        'situacao',
+      ],
+    });
+
+    // Mapeia para formato amigável ao frontend
+    return pes.map(pe => ({
+      id: pe.id_pe,
+      nome: pe.nome,
+      status: capitalizeSituacao(pe.situacao),
+      corStatus: mapStatusColor(pe.situacao),
+    }));
+  } catch (error) {
+    throw new Error(`Erro ao buscar pés do talhão ${talhaoId}: ${error.message}`);
+  }
+}
+
 async function getAllTalhoes() {
   try {
     const db = await getDb();
@@ -89,10 +113,27 @@ async function updatePropertyTalhoesCount(propriedadeId) {
   await db.Propriedade.update({ talhoes_registrados: totalTalhoes }, { where: { id_propriedade: propriedadeId } });
 }
 
+function capitalizeSituacao(status) {
+  switch (status) {
+    case 'tratado': return 'Tratado';
+    case 'nao tratado': return 'Não Tratado';
+    default: return 'Sem informações';
+  }
+}
+
+function mapStatusColor(status) {
+  switch (status) {
+    case 'tratado': return 'roxo';
+    case 'nao tratado': return 'amarelo';
+    default: return 'cinza';
+  }
+}
+
 export default {
   createTalhao,
   createTalhoesBulk,
   getAllTalhoes,
+  getPesByTalhaoId,
   getTalhaoById,
   updateTalhao,
   deleteTalhao,

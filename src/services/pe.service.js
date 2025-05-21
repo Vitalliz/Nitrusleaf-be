@@ -116,12 +116,28 @@ async function updatePe(id, data) {
   }
 }
 
+// Buscar relatórios de um pé
+async function getRelatoriosByPeId(peId) {
+  try {
+    const db = await getDb();
+    const relatorios = await db.Relatorio.findAll({
+      where: { fk_id_pe: peId },
+      order: [['data_analise', 'DESC']],
+    });
+    return relatorios;
+  } catch (error) {
+    throw new Error(`Erro ao buscar relatórios do pé ${peId}: ${error.message}`);
+  }
+}
+
+
 export default {
   createPe,
   createPesBulk,
   getAllPes,
   getPeById,
   updatePe,
+  getRelatoriosByPeId,
   deletePe,
   updateTalhaoAndPropriedadePesCount
 };

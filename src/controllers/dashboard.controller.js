@@ -7,7 +7,7 @@ export async function getDashboardData(req, res) {
   try {
     const db = await getDb();
 
-    // Busca todos os relatórios da propriedade com associações para gráficos atuais
+    // 1. Busca todos os relatórios da propriedade para gráficos atuais
     const relatorios = await db.Relatorio.findAll({
       include: [{
         model: db.Pe,
@@ -21,7 +21,7 @@ export async function getDashboardData(req, res) {
     });
 
     // Inicializa dados para gráficos atuais
-    const pieChartData = [0, 0, 0]; // cobre, manganes, outros
+    const pieChartData = [0, 0, 0];
     const barDataLabels = [];
     const cobreData = [];
     const manganesData = [];
@@ -50,43 +50,47 @@ export async function getDashboardData(req, res) {
       manganesData.push(counts.manganes);
     }
 
+    // 2. Para o gráfico mensal: agrupa por mês e soma totais **por propriedade inteira**
+
+    // Data de corte: últimos 6 meses
     const sixMonthsAgo = new Date();
-sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
 
-// Primeiro, obter os IDs dos talhoes daquela propriedade:
-const talhoes = await db.Talhao.findAll({
-  where: { fk_id_propriedade: propertyId },
-  attributes: ['id_talhao'],
-  raw: true
-});
-const talhaoIds = talhoes.map(t => t.id_talhao);
+    // Buscar IDs dos Talhoes da propriedade
+    const talhoes = await db.Talhao.findAll({
+      where: { fk_id_propriedade: propertyId },
+      attributes: ['id_talhao'],
+      raw: true,
+    });
+    const talhaoIds = talhoes.map(t => t.id_talhao);
 
-// Obter os IDs dos pés que pertencem a esses talhões:
-const pes = await db.Pe.findAll({
-  where: { fk_id_talhao: talhaoIds },
-  attributes: ['id_pe'],
-  raw: true
-});
-const peIds = pes.map(p => p.id_pe);
+    // Buscar IDs dos Pes desses Talhoes
+    const pes = await db.Pe.findAll({
+      where: { fk_id_talhao: talhaoIds },
+      attributes: ['id_pe'],
+      raw: true,
+    });
+    const peIds = pes.map(p => p.id_pe);
 
-// Agora sim fazer a agregação dos relatórios, filtrando por fk_id_pe entre esses ids:
-const monthlyDataRaw = await db.Relatorio.findAll({
-  attributes: [
-    [fn('DATE_FORMAT', col('data_analise'), '%Y-%m'), 'month'],
-    [fn('SUM', literal('deficiencia_cobre = TRUE')), 'total_cobre'],
-    [fn('SUM', literal('deficiencia_manganes = TRUE')), 'total_manganes'],
-    [fn('SUM', literal('outros = TRUE')), 'total_outros'],
-  ],
-  where: {
-    data_analise: { [Op.gte]: sixMonthsAgo },
-    fk_id_pe: peIds.length > 0 ? peIds : null // para evitar erro se vazio
-  },
-  group: ['month'],
-  order: [['month', 'ASC']],
-  raw: true,
-});
+    // Agregação mensal sem incluir Pe ou Talhao
+    const monthlyDataRaw = await db.Relatorio.findAll({
+      attributes: [
+        [fn('DATE_FORMAT', col('data_analise'), '%Y-%m'), 'month'],
+        [fn('SUM', literal('deficiencia_cobre = TRUE')), 'total_cobre'],
+        [fn('SUM', literal('deficiencia_manganes = TRUE')), 'total_manganes'],
+        [fn('SUM', literal('outros = TRUE')), 'total_outros'],
+      ],
+      where: {
+        data_analise: { [Op.gte]: sixMonthsAgo },
+        fk_id_pe: peIds.length ? peIds : null,
+      },
+      group: ['month'],
+      order: [['month', 'ASC']],
+      raw: true,
+    });
 
-    // Preparar dados para frontend mensal
+
+    // Formata os dados para o frontend
     const monthlyLabels = [];
     const monthlyCobre = [];
     const monthlyManganes = [];
@@ -99,7 +103,6 @@ const monthlyDataRaw = await db.Relatorio.findAll({
       monthlyOutros.push(Number(entry.total_outros));
     }
 
-    // Resposta JSON completa
     res.json({
       pieChartData,
       barChartData: {
