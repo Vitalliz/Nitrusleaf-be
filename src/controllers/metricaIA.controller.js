@@ -60,9 +60,25 @@ async function deleteMetricaIA(req, res) {
   }
 }
 
+async function getMetricasByRelatorioId(req, res) {
+  try {
+    const { relatorioId } = req.query;
+    if (!relatorioId) {
+      return res.status(400).json({ error: "relatorioId é obrigatório" });
+    }
+
+    const metricas = await metricaIAService.getMetricasByRelatorioId(relatorioId);
+    res.json(metricas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
 export default {
   createMetricaIA,
   getAllMetricasIA,
+  getMetricasByRelatorioId,
   getMetricaIAById,
   updateMetricaIA,
   deleteMetricaIA,

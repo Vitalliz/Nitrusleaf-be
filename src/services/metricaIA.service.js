@@ -49,6 +49,18 @@ async function updateMetricaIA(id, data) {
   }
 }
 
+async function getMetricasByRelatorioId(relatorioId) {
+  try {
+    const db = await getDb();
+    const metricas = await db.MetricaIA.findAll({
+      where: { fk_id_relatorio: relatorioId },
+    });
+    return metricas;
+  } catch (error) {
+    throw new Error(`Erro ao buscar Métricas IA por relatório: ${error.message}`);
+  }
+}
+
 // Deletar uma Métrica IA por ID
 async function deleteMetricaIA(id) {
   try {
@@ -67,6 +79,7 @@ async function deleteMetricaIA(id) {
 export default {
   createMetricaIA,
   getAllMetricasIA,
+  getMetricasByRelatorioId,
   getMetricaIAById,
   updateMetricaIA,
   deleteMetricaIA,

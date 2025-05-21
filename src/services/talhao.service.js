@@ -113,6 +113,19 @@ async function updatePropertyTalhoesCount(propriedadeId) {
   await db.Propriedade.update({ talhoes_registrados: totalTalhoes }, { where: { id_propriedade: propriedadeId } });
 }
 
+async function getTalhoesByPropriedadeId(propriedadeId) {
+  try {
+    const db = await getDb();
+    const talhoes = await db.Talhao.findAll({
+      where: { fk_id_propriedade: propriedadeId },
+      order: [['nome', 'ASC']], // opcional
+    });
+    return talhoes;
+  } catch (error) {
+    throw new Error(`Erro ao buscar talhões da propriedade ${propriedadeId}: ${error.message}`);
+  }
+}
+
 function capitalizeSituacao(status) {
   switch (status) {
     case 'tratado': return 'Tratado';
@@ -133,6 +146,7 @@ export default {
   createTalhao,
   createTalhoesBulk,
   getAllTalhoes,
+  getTalhoesByPropriedadeId,
   getPesByTalhaoId,
   getTalhaoById,
   updateTalhao,

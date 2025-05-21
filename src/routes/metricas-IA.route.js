@@ -7,6 +7,9 @@ const router = Router();
 // Rota para criar uma nova Métrica IA
 router.post('/', metricaIAController.createMetricaIA);
 
+// Rota para buscar Métricas IA por relatório (query param)
+router.get('/search', metricaIAController.getMetricasByRelatorioId);
+
 // Rota para buscar todas as Métricas IA
 router.get('/', metricaIAController.getAllMetricasIA);
 

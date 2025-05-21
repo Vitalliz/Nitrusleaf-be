@@ -32,6 +32,17 @@ async function createTalhoesBulk(req, res) {
   }
 }
 
+async function getTalhoesByPropriedade(req, res) {
+  try {
+    const propriedadeId = req.params.id;
+    const talhoes = await talhaoService.getTalhoesByPropriedadeId(propriedadeId);
+    res.json(talhoes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
 // Buscar todos os Talhões
 async function getAllTalhoes(req, res) {
   try {
@@ -85,6 +96,7 @@ export default {
   createTalhao,
   getAllTalhoes,
   getPesByTalhaoId,
+  getTalhoesByPropriedade,
   createTalhoesBulk,
   getTalhaoById,
   updateTalhao,

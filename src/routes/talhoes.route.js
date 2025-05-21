@@ -15,6 +15,7 @@ router.get('/', talhaoController.getAllTalhoes);
 
 router.get('/:id/pes', talhaoController.getPesByTalhaoId);
 
+router.get('/propriedade/:id', talhaoController.getTalhoesByPropriedade);
 
 // Rota para buscar um Talhão por ID
 router.get('/:id', talhaoController.getTalhaoById);
